@@ -1,2 +1,2 @@
-# english_exercises-NLP
+# english-exercises-NLP
 Генератор упражнений по английскому языку
