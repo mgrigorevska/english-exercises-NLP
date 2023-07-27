@@ -61,12 +61,19 @@ def option_check(option, corr_counter, answ):
 
 def gap_func(df, ex_num_option):
     corr_counter = 0
+
     for i in range(ex_num_option):
-        splitted = df.sent[i].split(df.answ[i])    # делаем сплит по ответу, допольнить позже
+
+        splitted = df.sent[i].split(df.answ[i])    # делаем сплит по ответу, дополнить позже
         st.write('______'.join(splitted))
         option = st.selectbox('Выбери ответ: ', (df.answ_list[i]), key='gap'+str(i))
         corr_counter = option_check(option, corr_counter, df.answ[i])
+        
+        if ex_num_option == 0:
+            st.info('Текст не загружен, или в тексте нет подходящих предложений.')
+
         st.divider()
+
     return corr_counter         
 
 ## вывод кол-ва верных ответов
@@ -81,12 +88,13 @@ def verb_func(df):
     for i in range(len(df)):
         doc = nlp(df.sent[i])
 
-        answ_list = []
         for token in doc:
             if token.pos_ == 'VERB':
                 df.answ[i] = token.text
                 df.answ_list[i] = token._.inflect('VB')  
-    df = df.dropna().reset_index(drop=True)             
+
+    df = df.dropna().reset_index(drop=True)
+             
     for i in range(len(df)):
         answ_list = []
         answ_list.append(list(getInflection(df.answ_list[i], tag='VBZ'))[0])  # добавляем варианты форм 
@@ -105,9 +113,9 @@ def verb_func(df):
         random.shuffle(answ_list)
         answ_list.insert(0, '')
         df.answ_list[i] = answ_list
+
     ex_num_option = ex_num_slider(df)
     corr_counter = gap_func(df, ex_num_option)
-
     answ_counter_func(corr_counter, ex_num_option)
 
 
@@ -174,6 +182,9 @@ def word_order_func(df):
             if st.button('Показать ответ', key='show_answ'+str(i)):
                 st.write(' '.join(df.answ[i]))
 
+        if ex_num_option == 0:
+            st.info('Текст не загружен, или в тексте нет подходящих предложений.')
+
         st.divider()
 
     return corr_counter, ex_num_option
@@ -206,6 +217,9 @@ def audio_func(df):
         st.write('______'.join(splitted))
         option = st.text_input('Напиши свой ответ:', '', key='fill_the_gap'+str(i))
         corr_counter = option_check(option, corr_counter, df.answ[i])
+
+        if ex_num_option == 0:
+            st.info('Текст не загружен, или в тексте нет подходящих предложений.')
 
         st.divider()
 
