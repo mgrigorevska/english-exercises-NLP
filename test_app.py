@@ -46,7 +46,7 @@ def ex_num_slider(df):
         ex_num_option = 0
     else:
         with st.sidebar:
-            ex_num_option = st.slider('Выбери количество предложений:', 1,
+            ex_num_option = st.slider('Количество предложений:', 1,
                                       len(df),
                                       len(df)//4,
                                       key='slider')
@@ -243,7 +243,7 @@ def audio_func(df):
 st.title('Генератор простых упражнений по английскому языку')
 st.caption('Для продолжения выбери текстовый файл или введи свой текст и нажми Enter')
 with st.sidebar:
-    st.subheader()
+    st.subheader('Параметры:')
 
 ## загрузка текста
 
@@ -281,7 +281,7 @@ df['answ_list'] = np.nan
 
 ## выбор упражнения
 with st.sidebar:
-    ex_option = st.radio('Выбери тип упражения:',
+    ex_option = st.radio('Тип упражения:',
         ('Времена глаголов', 'Форма прилагательных',
          'Порядок слов в предложении', 'Аудио'), key='ex_type')
 
