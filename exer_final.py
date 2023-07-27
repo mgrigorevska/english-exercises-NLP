@@ -1,11 +1,9 @@
 ## импорты
 
-
 import spacy
 import re
 import pandas as pd
-#import pyinflect
-#from pyinflect import getAllInflections
+import pyinflect
 import numpy as np
 import streamlit as st
 from nltk.tokenize import sent_tokenize
@@ -16,11 +14,12 @@ from random import randint
 #import gensim.downloader as api
 #from multiprocessing import cpu_count
 #from gensim.models.word2vec import Word2Vec
-from pattern3.en import lexeme, comparative, superlative
+#from pattern3.en import lexeme, comparative, superlative
 from io import StringIO
 from gtts import gTTS
 #import os
 from playsound import playsound
+#import lemminflect
 
 nltk.download('punkt')
 nltk.download('wordnet')
@@ -100,10 +99,43 @@ def verb_func(df):
     with st.sidebar:
         st.write('Процент правильных ответов:', round(num, 2)*100, '%')
 
+def verb_func(df):
+    for i in range(len(df)):
+        doc = nlp(df.sent[i])
+
+        answ_list = []
+        for token in doc:
+            if token.pos_ == 'VERB':
+                df.answ[i] = token.text
+
+                answ_list.append(token._.inflect('VBZ').lower())
+                answ_list.append(token._.inflect('VBG').lower())
+                answ_list.append(token._.inflect('VBD').lower())
+                answ_list.append(token._.inflect('VBP').lower())
+                answ_list.append('had ' + token._.inflect('VBN').lower())
+
+                for form in answ_list:
+                    if form.lower() == df.answ[i].lower():
+                        answ_list.remove(form)
+
+                random.shuffle(answ_list)
+                answ_list = answ_list[:3]
+                answ_list.append(df.answ[i].lower())
+                random.shuffle(answ_list)
+                answ_list.insert(0, '')
+                df.answ_list[i] = answ_list
+                break
+    df = df.dropna().reset_index(drop=True)
+    ex_num_option = ex_num_slider(df)
+    num = gap_func(df, ex_num_option)
+    with st.sidebar:
+        st.write('Процент правильных ответов:', round(num, 2) * 100, '%')
+
 
 ## прилагательные
 
-def func_adj(df):
+
+def adj_func(df):
     for i in range(len(df)):
         doc = nlp(df.sent[i])
         for token in doc:
@@ -111,9 +143,14 @@ def func_adj(df):
 
             if token.pos_ == 'ADJ':
                 df.answ[i] = token.text
-                answ_list.append(token.text)
-                answ_list.append(comparative(df.answ[i]))
-                answ_list.append(superlative(df.answ[i]))
+              #  st.write(df)
+                answ_list.append(token._.inflect('JJR').lower())
+                answ_list.append(token._.inflect('JJ').lower())
+                answ_list.append('the ' + token._.inflect('JJS').lower())
+                for form in answ_list:
+                    if form.lower() == df.answ[i].lower():
+                        answ_list.remove(form)
+                answ_list.append(df.answ[i].lower())
                 random.shuffle(answ_list)
                 answ_list.insert(0, '')
                 df.answ_list[i] = answ_list
@@ -123,8 +160,7 @@ def func_adj(df):
     ex_num_option = ex_num_slider(df)
     num = gap_func(df, ex_num_option)
     with st.sidebar:
-        st.write('Процент правильных ответов:', round(num, 2)*100, '%')
-
+        st.write('Процент правильных ответов:', round(num, 2) * 100, '%')
 
 ## порядок слов в предложении
 
@@ -257,7 +293,7 @@ if ex_option == 'Времена глаголов':
 
 if ex_option == 'Форма прилагательных':
     df = df.query('ex_type == "adjective_form"').reset_index(drop=True)
-    func_adj(df)
+    adj_func(df)
 
 
     ## выбор порядок слов
