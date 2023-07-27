@@ -71,11 +71,13 @@ def gap_func(df, ex_num_option):
     for i in range(ex_num_option):
         splitted = df.sent[i].split(df.answ[i])
         st.write('______'.join(splitted))
-        option = st.selectbox('Заполни пробел:', (df.answ_list[i]), key='gap'+str(i))
+        option = st.selectbox('Выбери ответ: ', (df.answ_list[i]), key='gap'+str(i))
         corr_counter = option_check(option, corr_counter, df.answ[i])
     #if ex_num_option == 0:
     #    st.error('В тексте нет подходящих предложений.')
    #     ex_num_option = 1
+        st.divider()
+
     return corr_counter
 
 def answ_counter_func(corr_counter, ex_num_option):
@@ -135,9 +137,9 @@ def verb_func(df):
         random.shuffle(answ_list)
         answ_list.insert(0, '')
         df.answ_list[i] = answ_list
-
     ex_num_option = ex_num_slider(df)
     corr_counter = gap_func(df, ex_num_option)
+
     answ_counter_func(corr_counter, ex_num_option)
 
 ## прилагательные
@@ -194,6 +196,7 @@ def word_order_func(df):
             st.error('Попробуй еще раз', icon='❌')
             if st.button('Показать ответ', key='show_answ'+str(i)):
                 st.write(' '.join(df.answ[i]))
+        st.divider()
     #if ex_num_option == 0:
     #    st.error('В тексте нет подходящих предложений.')
     #    ex_num_option = 1
@@ -202,7 +205,7 @@ def word_order_func(df):
 
 #### аудио ####
 
-def audio_func(df, speed_option):
+def audio_func(df):
     for i in range(len(df)):
         doc = nlp(df.sent[i])
         for token in doc:
@@ -215,45 +218,43 @@ def audio_func(df, speed_option):
     corr_counter = 0
 
     for i in range(ex_num_option):
-        if speed_option == 'Медленно':
-            speed = True
-        else:
-            speed = False
         sound_file = BytesIO()
-        audio = gTTS(text = df.sent[i], lang='en', slow=speed)
+        audio = gTTS(text = df.sent[i], lang='en')
         audio.write_to_fp(sound_file)
         st.audio(sound_file)
 
         splitted = df.sent[i].split(df.answ[i])
         st.write('______'.join(splitted))
-
-        option = st.text_input('Заполни пробел:', '', key='fill_the_gap'+str(i))
+        option = st.text_input('Напиши свой ответ:', '', key='fill_the_gap'+str(i))
         corr_counter = option_check(option, corr_counter, df.answ[i])
 
     #if ex_num_option == 0:
     #        st.error('В тексте нет подходящих предложений.')
     #        ex_num_option = 1
 
-        st.write('------')
+        st.divider()
+
     #corr_counter = gap_func(df, ex_num_option)
     answ_counter_func(corr_counter, ex_num_option)
 
 ###################### ------- #########################
 
 
-
-
+st.title('Генератор простых упражнений по английскому языку')
+st.caption('Для продолжения выбери текстовый файл или введи свой текст и нажми Enter')
+with st.sidebar:
+    st.subheader()
 
 ## загрузка текста
 
 text = ''
-file = st.file_uploader('Выбери файл(.txt):')
+file = st.file_uploader('Выбрать файл(.txt):')
 if file is not None:
     stringio = StringIO(file.getvalue().decode("utf-8"))
     text = stringio.read()
     text_len_check(text)
 else:
-    text = st.text_input('Введи свой текст:', '', key='text_input')
+    text = st.text_input('Ввести свой текст:', '', key='text_input')
     text_len_check(text)
 
 
@@ -284,13 +285,15 @@ with st.sidebar:
         ('Времена глаголов', 'Форма прилагательных',
          'Порядок слов в предложении', 'Аудио'), key='ex_type')
 
-st.write('Текущее упражнение:', ex_option)
+st.write('Упражнение:  ', ex_option)
 nlp = spacy.load('en_core_web_sm')
 
 
 ## выбор времена глаголов
 
 if ex_option == 'Времена глаголов':
+    st.caption('Заполни пробел в предожении, выбрав вариант из выпадающего списка')
+
     #df = df.query('ex_type == "verb_time"').reset_index(drop=True)
 
     verb_func(df)
@@ -299,6 +302,8 @@ if ex_option == 'Времена глаголов':
 ## выбор форма прилагательных
 
 if ex_option == 'Форма прилагательных':
+    st.caption('Заполни пробел в предожении, выбрав вариант из выпадающего списка')
+
     #df = df.query('ex_type == "adjective_form"').reset_index(drop=True)
     adj_func(df)
 
@@ -307,6 +312,8 @@ if ex_option == 'Форма прилагательных':
 
 if ex_option == 'Порядок слов в предложении':
     #df = df.query('ex_type == "word_order"').reset_index(drop=True)
+    st.caption('Составь предложение в правильном порядке, выбрав варианты из выпадающего списка')
+
 
     corr_counter, ex_num_option = word_order_func(df)
     answ_counter_func(corr_counter, ex_num_option)
@@ -316,10 +323,9 @@ if ex_option == 'Порядок слов в предложении':
 
 if ex_option == 'Аудио':
     #df = df.query('ex_type == "audio"').reset_index(drop=True)
-    speed_option = st.radio('Выбери скорость воспроизведения:',
-                         ('Быстро', 'Медленно'), key='audio_speed')
+    st.caption('Прослушай предложение и заполни пробел, написав слово в ячейке')
 
-    audio_func(df, speed_option)
+    audio_func(df)
 
 
 
