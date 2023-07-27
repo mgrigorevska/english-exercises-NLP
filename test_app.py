@@ -206,15 +206,14 @@ def audio_func(df, speed_option):
     corr_counter = 0
 
     for i in range(ex_num_option):
-        if st.button('Проиграть аудио', key='play_audio'+str(i)):
-            if speed_option == 'Медленно':
-                speed = True
-            else:
-                speed = False
-
-            audio = gTTS(text = df.sent[i], lang='en', slow=speed)
-            audio.save('ex.mp3')
-            playsound("ex.mp3")
+        if speed_option == 'Медленно':
+            speed = True
+        else:
+            speed = False
+        sound_file = BytesIO()
+        audio = gTTS(text = df.sent[i], lang='en', slow=speed)
+        audio.write_to_fp(sound_file)
+        st.audio(sound_file)
 
         splitted = df.sent[i].split(df.answ[i])
         st.write('______'.join(splitted))
