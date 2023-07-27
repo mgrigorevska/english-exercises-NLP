@@ -15,7 +15,7 @@ from random import randint
 #from multiprocessing import cpu_count
 #from gensim.models.word2vec import Word2Vec
 #from pattern3.en import lexeme, comparative, superlative
-from io import StringIO
+from io import StringIO, BytesIO
 from gtts import gTTS
 #import os
 #from playsound import playsound
