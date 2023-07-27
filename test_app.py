@@ -18,7 +18,7 @@ from random import randint
 from io import StringIO
 from gtts import gTTS
 #import os
-from playsound import playsound
+#from playsound import playsound
 #import lemminflect
 
 nltk.download('punkt')
