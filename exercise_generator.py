@@ -40,38 +40,45 @@ def ex_num_slider(df):
     else:
         with st.sidebar:
             ex_num_option = st.slider('Количество предложений:', 1,
-                                      len(df),
-                                      len(df)//4,
+                                      len(df), 
+                                      len(df) // 3,            # показываем по умолчанию треть упражнений                     
                                       key='slider')
     return ex_num_option
 
 ## счетчик правильных ответов
 
-def option_check(option, corr_counter, answ):
+def option_check(option, corr_counter, answ, i):
     if option == '':
         st.write('')
     elif option.lower() == answ.lower():
         st.success('Правильный ответ', icon='✅')
         corr_counter += 1
     else:
-        st.error('Попробуй еще раз', icon='❌')
+        st.error('Попробуйте еще раз', icon='❌')
+        if st.button('Показать ответ', key='show_answ'+str(i)):
+            st.write(answ)
     return corr_counter
+
+## info 
+
+def info_func(ex_num_option):
+    if ex_num_option == 0:
+        st.info('🤔 Похоже, тут ничего нет. Возможные причины: выбрано нулевое число упражнений, или в тексте нет подходящих предложений. Попробуйте загрузить другой текст😅')
 
 ## дырка в предложении c selectbox и счетчиком
 
 def gap_func(df, ex_num_option):
+
     corr_counter = 0
+    info_func(ex_num_option)
 
     for i in range(ex_num_option):
-
+        
         splitted = df.sent[i].split(df.answ[i])    # делаем сплит по ответу, дополнить позже
         st.write('______'.join(splitted))
         option = st.selectbox('Выбери ответ: ', (df.answ_list[i]), key='gap'+str(i))
-        corr_counter = option_check(option, corr_counter, df.answ[i])
+        corr_counter = option_check(option, corr_counter, df.answ[i], i)
         
-        if ex_num_option == 0:
-            st.info('Текст не загружен, или в тексте нет подходящих предложений.')
-
         st.divider()
 
     return corr_counter         
@@ -164,11 +171,12 @@ def word_order_func(df):
     df = df.dropna().reset_index(drop=True)
     ex_num_option = ex_num_slider(df)
     corr_counter = 0
+    info_func(ex_num_option)
 
     for i in range(ex_num_option):
 
         random.shuffle(df.answ_list[i])
-        options = st.multiselect('Составь предложение:', df.answ_list[i]) # выбор слов в мультиселект
+        options = st.multiselect('Составьте предложение:', df.answ_list[i]) # выбор слов в мультиселект
         
         if options == []:                                                 # и счетчик правильных ответов
             st.write('')
@@ -178,12 +186,9 @@ def word_order_func(df):
             corr_counter +=1
 
         else:
-            st.error('Попробуй еще раз', icon='❌')
+            st.error('Попробуйте еще раз', icon='❌')
             if st.button('Показать ответ', key='show_answ'+str(i)):
                 st.write(' '.join(df.answ[i]))
-
-        if ex_num_option == 0:
-            st.info('Текст не загружен, или в тексте нет подходящих предложений.')
 
         st.divider()
 
@@ -205,6 +210,7 @@ def audio_func(df):
     df = df.dropna().reset_index(drop=True)
     ex_num_option = ex_num_slider(df)
     corr_counter = 0
+    info_func(ex_num_option)
 
     for i in range(ex_num_option):
 
@@ -215,11 +221,8 @@ def audio_func(df):
 
         splitted = df.sent[i].split(df.answ[i])
         st.write('______'.join(splitted))
-        option = st.text_input('Напиши свой ответ:', '', key='fill_the_gap'+str(i))
-        corr_counter = option_check(option, corr_counter, df.answ[i])
-
-        if ex_num_option == 0:
-            st.info('Текст не загружен, или в тексте нет подходящих предложений.')
+        option = st.text_input('Напишите свой ответ:', '', key='fill_the_gap'+str(i))
+        corr_counter = option_check(option, corr_counter, df.answ[i], i)
 
         st.divider()
 
@@ -228,7 +231,7 @@ def audio_func(df):
 ###################### ВЫПОЛНЕНИЕ #########################
 
 st.title('Генератор простых упражнений по английскому языку')
-st.caption('Для продолжения выбери текстовый файл или введи свой текст и нажми Enter')
+st.caption('Для продолжения выберите текстовый файл или введи свой текст и нажми Enter')
 
 with st.sidebar:
     st.subheader('Параметры:')
@@ -245,7 +248,8 @@ if file is not None:
 
 else:
     text = st.text_input('Ввести свой текст:', '', key='text_input')
-    text_len_check(text)
+    if text is not None:
+        text_len_check(text)
 
 
 
@@ -278,7 +282,7 @@ st.write('Упражнение:  ', ex_option)
 ## выбор времена глаголов
 
 if ex_option == 'Времена глаголов':
-    st.caption('Заполни пробел в предожении, выбрав вариант из выпадающего списка')
+    st.caption('Заполните пробел в предложении, выбрав вариант из выпадающего списка')
 
     verb_func(df)
 
@@ -286,7 +290,7 @@ if ex_option == 'Времена глаголов':
 ## выбор форма прилагательных
 
 if ex_option == 'Форма прилагательных':
-    st.caption('Заполни пробел в предожении, выбрав вариант из выпадающего списка')
+    st.caption('Заполните пробел в предложении, выбрав вариант из выпадающего списка')
 
     adj_func(df)
 
@@ -295,7 +299,7 @@ if ex_option == 'Форма прилагательных':
 
 if ex_option == 'Порядок слов в предложении':
 
-    st.caption('Составь предложение в правильном порядке, выбрав варианты из выпадающего списка')
+    st.caption('Составьте предложение в правильном порядке, выбрав варианты из выпадающего списка')
 
     corr_counter, ex_num_option = word_order_func(df)
     answ_counter_func(corr_counter, ex_num_option)
@@ -305,7 +309,7 @@ if ex_option == 'Порядок слов в предложении':
 
 if ex_option == 'Аудио':
 
-    st.caption('Прослушай предложение и заполни пробел, написав слово в ячейке')
+    st.caption('Прослушайте предложение и заполни пробел, написав слово в ячейке')
 
     audio_func(df)
 
