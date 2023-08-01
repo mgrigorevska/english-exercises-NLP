@@ -110,9 +110,7 @@ def verb_func(df):
         answ_list.append(list(getInflection(df.answ_list[i], tag='VBP'))[0])
         answ_list.append('had ' + list(getInflection(df.answ_list[i], tag='VBN'))[0])
 
-        for form in answ_list:
-            if form.lower() == df.answ[i].lower():      # убираем дублирующиеся формы, если есть
-                answ_list.remove(form)
+        answ_list = [form for form in answ_list if form.lower() != df.answ[i].lower()]
 
         random.shuffle(answ_list)
         answ_list = answ_list[:3]                       # оставляем 4 варианта ответов и перемешиваем     
@@ -145,9 +143,8 @@ def adj_func(df):
         answ_list.append(list(getInflection(df.answ_list[i], tag='JJR'))[0])
         answ_list.append('the ' + list(getInflection(df.answ_list[i], tag='JJS'))[0])
 
-        for form in answ_list:
-            if form.lower() == df.answ[i].lower():
-                answ_list.remove(form)
+        answ_list = [form for form in answ_list if form.lower() != df.answ[i].lower()]
+
         answ_list.append(df.answ[i].lower())
         random.shuffle(answ_list)
         answ_list.insert(0, '')
