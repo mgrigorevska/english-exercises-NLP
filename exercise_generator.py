@@ -101,23 +101,15 @@ def verb_func(df):
                 df.answ_list[i] = token._.inflect('VB')  
 
     df = df.dropna().reset_index(drop=True)
-             
+    answ_list = set()
+    forms_list = ['VBZ', 'VBG', 'VBD', 'VBP']
+
     for i in range(len(df)):
-        answ_list = []
-        answ_list.append(list(getInflection(df.answ_list[i], tag='VBZ'))[0])  # добавляем варианты форм 
-        answ_list.append(list(getInflection(df.answ_list[i], tag='VBG'))[0])
-        answ_list.append(list(getInflection(df.answ_list[i], tag='VBD'))[0])
-        answ_list.append(list(getInflection(df.answ_list[i], tag='VBP'))[0])
-        answ_list.append('had ' + list(getInflection(df.answ_list[i], tag='VBN'))[0])
 
-        answ_list = [form for form in answ_list if form.lower() != df.answ[i].lower()]
-
-        random.shuffle(answ_list)
-        answ_list = answ_list[:3]                       # оставляем 4 варианта ответов и перемешиваем     
-        answ_list.append(df.answ[i].lower())
-        random.shuffle(answ_list)
-        answ_list.insert(0, '')
-        df.answ_list[i] = answ_list
+        answ_list = {list(getInflection(df.answ_list[i].lower(), tag=form))[0] for form in forms_list}
+        answ_list.add('had ' + list(getInflection(df.answ_list[i].lower(), tag='VBN'))[0])
+        df.answ_list[i] = list(answ_list)
+        df.answ_list[i].insert(0, '')
 
     ex_num_option = ex_num_slider(df)
     corr_counter = gap_func(df, ex_num_option)
@@ -138,17 +130,14 @@ def adj_func(df):
     df = df.dropna().reset_index(drop=True)
 
     for i in range(len(df)):
-        answ_list = []
-        answ_list.append(list(getInflection(df.answ_list[i], tag='JJ'))[0])
-        answ_list.append(list(getInflection(df.answ_list[i], tag='JJR'))[0])
-        answ_list.append('the ' + list(getInflection(df.answ_list[i], tag='JJS'))[0])
+        answ_list = set()
+        answ_list.add(list(getInflection(df.answ_list[i], tag='JJ'))[0].lower())
+        answ_list.add(list(getInflection(df.answ_list[i], tag='JJR'))[0].lower())
+        answ_list.add('the ' + list(getInflection(df.answ_list[i], tag='JJS'))[0].lower())
+        answ_list.add(df.answ[i].lower())
 
-        answ_list = [form for form in answ_list if form.lower() != df.answ[i].lower()]
-
-        answ_list.append(df.answ[i].lower())
-        random.shuffle(answ_list)
-        answ_list.insert(0, '')
-        df.answ_list[i] = answ_list
+        df.answ_list[i] = list(answ_list)
+        df.answ_list[i].insert(0, '')
 
     ex_num_option = ex_num_slider(df)
     corr_counter = gap_func(df, ex_num_option)
