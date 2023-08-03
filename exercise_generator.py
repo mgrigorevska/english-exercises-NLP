@@ -216,7 +216,7 @@ def audio_func(df):
 
 ###################### ВЫПОЛНЕНИЕ #########################
 
-st.set_page_config(page_title='SEGen', page_icon=':gb:')
+st.set_page_config(page_title='SEGen', page_icon=':abc:')
 
 st.title('Генератор простых упражнений по английскому языку')
 st.caption('Для продолжения выберите текстовый файл или введи свой текст и нажми Enter')
