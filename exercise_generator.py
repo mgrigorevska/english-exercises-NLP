@@ -235,9 +235,9 @@ if file is not None:
     text_len_check(text)
 
 else:
-    text = st.text_input('Ввести свой текст:', '', max_chars=10000, key='text_input', help='Лучше загружать текст из 10 предложений и более')
-    if text is not None:
-        text_len_check(text)
+    text = st.text_input('Ввести свой текст:', '',
+                         max_chars=10000, key='text_input',
+                         help='Лучше загружать текст из 10 предложений и более')
 
 ## создание датафрейма 
 
